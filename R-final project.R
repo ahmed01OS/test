@@ -1,0 +1,64 @@
+make_Cache_Matrix <- function(x = matrix()) {
+  m <- NULL
+  set <- function(y) {
+    x <<- y
+    m <<- NULL
+  }
+  get <- function() x
+  setinv <- function(inv) m <<- inv
+  getinv <- function() m
+  list(set = set,
+       get = get,
+       setinv = setinv,
+       getinv = getinv)
+}
+
+cache_Solve <- function(x, ...) {
+  m <- x$getinv()
+  if (!is.null(m)) {
+    message("getting cached data")
+    return(m)
+  }
+  data <- x$get()
+  m <- solve(data, ...)
+  x$setinv(m)
+  m
+}
+##____________________________________________________
+my_mode <- function(x) {
+  u <- unique(x)
+  co <- vector()
+  for (i in 1:length(u)) {
+    co[i] <- length(which(x==u[i]))
+  }
+  position <- c(which(co==max(co))) 
+  if (mean(co)==max(co))
+    return("no mode")
+  else 
+    return(u[position]) }
+my_mode(c(13, 18, 13, 14, 13, 16, 14, 21, 13))
+my_mode(c(8, 18, 13, 14, 4, 16, 14, 21, 8))
+my_mode(c(3, 5, 13, 5, 13, 3))
+
+##_____________________________________________________
+mtcars
+mtcars$am <- factor(mtcars$am,labels=c("Automatic","Manual"))
+
+## the relationship between mpg and other variables by corrulation
+cor(mtcars$mpg,mtcars)
+
+##Is an automatic or manual transmission better for MPG?
+
+t.test(mtcars$mpg~mtcars$am,var.equal=T,conf.level=0.95) 
+boxplot(mpg~am, data = mtcars)
+
+##Quantify the MPG difference between automatic and manual transmissions
+
+quality = lm(mpg~.,data=mtcars)
+plot(quality)
+## the stepwise regression
+Reg_step = step(quality, direction = "both")
+summary(Reg_step)
+plot(Reg_step)
+## MPG histogram
+hist(mtcars$mpg)
